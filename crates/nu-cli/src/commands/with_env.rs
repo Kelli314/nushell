@@ -9,7 +9,8 @@ pub struct WithEnv;
 
 #[derive(Deserialize, Debug)]
 struct WithEnvArgs {
-    variable: (Tagged<String>, Tagged<String>),
+    //variable: (Tagged<String>, Tagged<String>),
+    variable: Vec<(Tagged<String>, Tagged<String>)>,
     block: Block,
 }
 
@@ -64,7 +65,11 @@ async fn with_env(
     let mut scope = raw_args.call_info.scope.clone();
     let (WithEnvArgs { variable, block }, input) = raw_args.process(&registry).await?;
 
-    scope.env.insert(variable.0.item, variable.1.item);
+    for x in variable.into_iter(){
+        scope.env.insert(x.0.item, x.1.item);
+    }
+
+    //scope.env.insert(variable.0.item, variable.1.item);
 
     let result = run_block(
         &block,
